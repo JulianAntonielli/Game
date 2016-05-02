@@ -96,5 +96,6 @@ public class Game extends Canvas implements Runnable {
 	public static void main(String[] args) {
 		Game game = new Game();
 		game.start();
+		System.out.println("Juego terminado!");
 	}
 }
