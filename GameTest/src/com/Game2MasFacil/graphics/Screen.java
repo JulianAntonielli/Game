@@ -1,14 +1,24 @@
 package com.Game2MasFacil.graphics;
 
+import java.util.Random;
+
 public class Screen {
 
 	private int width, height;
 	public int[] pixels;
 
+	public int[] tiles = new int[64 * 64];
+
+	private Random random = new Random();
+
 	public Screen(int width, int height) {
 		this.width = width;
 		this.height = height;
 		pixels = new int[width * height];
+
+		for (int i = 0; i < 64 * 64; i++) {
+			tiles[i] = random.nextInt(0xffffff);
+		}
 	}
 
 	public void clear() {
@@ -17,20 +27,15 @@ public class Screen {
 		}
 	}
 
-	int time = 0, counter = 0; //remove l8r;
-
 	public void render() {
-		counter++;
-		if (counter % 20 == 0) {
-			time++;
-		}
-
 		for (int y = 0; y < height; y++) {
+			if (y >= height || y < 0)
+				break;
 			for (int x = 0; x < width; x++) {
-				pixels[time+1+time*width] = 0xffffff;
-				pixels[time+(1+time)*width] = 0xffffff;
-				pixels[time+1+(1+time)*width] = 0xffffff;
-				pixels[time+time*width] = 0xffffff;
+				if (x >= width || x < 0)
+					break;
+				int tileIndex = (x >> 4) + (y >> 4) * width;
+				pixels[x + y * width] = tiles[tileIndex];
 			}
 		}
 	}

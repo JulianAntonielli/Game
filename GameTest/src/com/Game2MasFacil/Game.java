@@ -13,12 +13,14 @@ import javax.swing.JFrame;
 import com.Game2MasFacil.graphics.Screen;
 
 public class Game extends Canvas implements Runnable {
-
 	private static final long serialVersionUID = 1L;
-	public static int width = 300;
-	public static int height = width / 12 * 9;
-	public static int scale = 2;
 
+	
+	public static int width = 300;
+	public static int height = width / 16 * 9;
+	public static int scale = 3;
+	public static String title = "Juego";
+	
 	private Thread thread;
 	private JFrame frame;
 	private boolean running = false;
@@ -35,7 +37,7 @@ public class Game extends Canvas implements Runnable {
 		frame = new JFrame();
 
 		frame.setResizable(false);
-		frame.setTitle("Juego!");
+		frame.setTitle(title);
 		frame.add(this);
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,10 +61,32 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	public void run() {
+		long lastTime = System.nanoTime();
+		long timer = System.currentTimeMillis();
+		final double ns = 1000000000.0 / 60.0; // Nanosegundos necesarios para
+												// correr el juego a 60fps
+		double delta = 0;
+		int frames = 0;
+		int updates = 0;
 		while (running) {
-			tick();
+			long now = System.nanoTime();
+			delta += (now - lastTime) / ns;
+			lastTime = now;
+			while (delta >= 1) {
+				tick();
+				updates++;
+				delta--;
+			}
 			render();
+			frames++;
+
+			if (System.currentTimeMillis() - timer > 1000) {
+				timer += 1000;
+				frame.setTitle(title + "\t \t FPS: " + frames + " UPS: " + updates + ".");
+				frames = updates = 0;
+			}
 		}
+		stop();
 	}
 
 	public void tick() {
@@ -75,9 +99,9 @@ public class Game extends Canvas implements Runnable {
 			createBufferStrategy(3);
 			return;
 		}
-		
+
 		screen.clear();
-		
+
 		screen.render();
 
 		for (int i = 0; i < pixels.length; i++) {
