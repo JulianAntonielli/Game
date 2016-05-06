@@ -1,4 +1,4 @@
-package com.Game2MasFacil;
+package com.Wave;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -10,19 +10,20 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
-import com.Game2MasFacil.graphics.Screen;
+import com.Wave.Graphics.Screen;
+import com.Wave.input.Keyboard;
 
 public class Game extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
-	
-	public static int width = 300;
+	public static int width = 320;
 	public static int height = width / 16 * 9;
 	public static int scale = 3;
 	public static String title = "Juego";
-	
+
 	private Thread thread;
 	private JFrame frame;
+	private Keyboard keyboard;
 	private boolean running = false;
 
 	private Screen screen;
@@ -35,7 +36,10 @@ public class Game extends Canvas implements Runnable {
 
 		screen = new Screen(width, height);
 		frame = new JFrame();
-
+		keyboard = new Keyboard();
+		
+		addKeyListener(keyboard);
+		
 		frame.setResizable(false);
 		frame.setTitle(title);
 		frame.add(this);
@@ -43,6 +47,7 @@ public class Game extends Canvas implements Runnable {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+		requestFocus();
 	}
 
 	public synchronized void start() {
@@ -68,6 +73,7 @@ public class Game extends Canvas implements Runnable {
 		double delta = 0;
 		int frames = 0;
 		int updates = 0;
+		
 		while (running) {
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
@@ -89,8 +95,14 @@ public class Game extends Canvas implements Runnable {
 		stop();
 	}
 
-	public void tick() {
+	public int x = 0, y = 0;
 
+	public void tick() {
+		keyboard.tick();
+		if(keyboard.up) y--;
+		if(keyboard.down) y++;
+		if(keyboard.left) x--;
+		if(keyboard.right) x++;
 	}
 
 	public void render() {
@@ -102,7 +114,7 @@ public class Game extends Canvas implements Runnable {
 
 		screen.clear();
 
-		screen.render();
+		screen.render(x, y);
 
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = screen.pixels[i];
